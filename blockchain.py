@@ -27,7 +27,10 @@ class Blockchain(object):
         if transaction.verify() and transaction not in self.mempool and utils.str_to_time(transaction.date) >= utils.str_to_time(utils.get_time()) : 
             self.mempool.append(transaction)
             return True
-        else : 
+        else :
+            # En période de test, on ajoute la transaction quoi qu'il arrive !
+            self.mempool.append(transaction)
+
             return False
 
     def new_block(self, block=None):

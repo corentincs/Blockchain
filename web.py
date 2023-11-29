@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template, redirect
 from blockchain import Blockchain
 from block import Block, InvalidBlock
 from transaction import Transaction
@@ -8,6 +8,7 @@ from uuid import uuid4
 # Instantiate our Node
 app = Flask(__name__)
 
+app.config['SECRET_KEY'] = 'your_secret_key_here'
 # Generate a globally unique address for this node
 node_identifier = str(uuid4()).replace('-', '')
 
@@ -42,29 +43,16 @@ def mine():
         'previous_hash': block['previous_hash'],
     }
     return jsonify(response), 200
-  
-@app.route('/transactions/new', methods=['POST'])
-def new_transaction():
-    values = request.get_json()
 
-    # Check that the required fields are in the POST'ed data
-    required = ['message', 'recipient', 'amount']
-    if not all(k in values for k in required):
-        return 'Missing values', 400
+#curl -X POST -H "Content-Type: application/json" -d '{
+# "message": "I put my vote"}' "http://localhost:5000/transactions/new"
 
-    transaction = Transaction()
-    blockchain.add_transaction(transaction)
-
-    # Create a new Transaction
-    #index = blockchain.new_transaction(values['sender'], values['recipient'], values['amount'])
-
-    response = {'message': f'Transaction have been added to mempool'}
-    return jsonify(response), 201
 
 @app.route('/chain', methods=['GET'])
 def full_chain():
     response = {
         'chain': str(blockchain),
+        'mempool':str(blockchain.mempool),
         'length': len(blockchain.blocks),
     }
     return jsonify(response), 200
@@ -107,6 +95,44 @@ def consensus():
 
     return jsonify(response), 200
 
+
+from forms import TransactionForm
+
+@app.route('/', methods=['GET'])
+def accueil():
+    return render_template('accueil.html')
+
+
+
+@app.route('/voter', methods=['GET', 'POST'])
+def voter():
+
+    if request.method == 'POST':
+
+        message = request.form.get("message")
+
+        # Check that the required fields are in the POST'ed data
+        #required = ['message']
+        #if not all(k in values for k in required):
+        #    return 'Missing values', 400
+
+        transaction = Transaction(message=message)
+        blockchain.add_transaction(transaction)
+
+        # Create a new Transaction
+        #index = blockchain.new_transaction(values['sender'], values['recipient'], values['amount'])
+
+        # return redirect('/voter')
+
+    form = TransactionForm()
+
+    return render_template('voter.html', form=form)
+
+@app.route('/avancement', methods=['GET'])
+def avancement():
+    mempool_data = blockchain.mempool
+
+    return render_template('avancement.html', mempool_data=mempool_data)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

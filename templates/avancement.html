@@ -1,0 +1,18 @@
+<!-- Avancement.html -->
+{% extends 'base.html' %}
+
+{% block title %}Avancement{% endblock %}
+
+{% block content %}
+    <h1>Avancement du vote</h1>
+    <p>...</p>
+    
+    <h1>Mempool</h1>
+    <ul>
+        {% for transaction in mempool_data %}
+            <li>{{ transaction }}</li>
+        {% endfor %}
+    </ul>
+
+    
+{% endblock %}

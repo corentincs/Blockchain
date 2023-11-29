@@ -99,7 +99,7 @@ class Transaction(object):
         :return: A string representation of the transaction
         """
         Transaction.log([self])
-        return ""
+        return str(self.data)
 
     def __lt__(self, other):
         """

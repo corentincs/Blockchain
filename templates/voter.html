@@ -1,0 +1,18 @@
+<!-- nouvelle_transaction.html -->
+{% extends 'base.html' %}
+
+{% block title %}Nouvelle Transaction{% endblock %}
+
+{% block content %}
+    <h1>Nouvelle Transaction</h1>
+    <form method="POST">
+        <div class="form-group">
+            {{ form.message.label(class="form-control-label") }}
+            {{ form.message(class="form-control", size=32) }}
+            {{ form.candidate }}
+        </div>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+{% endblock %}

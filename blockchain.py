@@ -197,3 +197,4 @@ if __name__ == '__main__':
     print("Blockchain test")
     simple_test()
     merge_test()
+

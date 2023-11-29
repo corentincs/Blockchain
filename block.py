@@ -72,8 +72,16 @@ class Block(object):
         String representation of the block
         :return: str
         """
+        data = {
+            "index" : self.index,
+            "timestamp" : self.timestamp,
+            "transactions" : [ str(transaction.data) for transaction in self.transactions],
+            "proof" : self.proof,
+            "previous_hash" : self.previous_hash
+        }
+
         Block.log(self)
-        return
+        return str(data)
 
     def valid_proof(self, difficulty=config.default_difficulty):
         """

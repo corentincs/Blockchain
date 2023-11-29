@@ -8,6 +8,11 @@ from block import Block, InvalidBlock
 from transaction import Transaction
 import utils
 
+import requests
+from uuid import uuid4
+
+from flask import Flask, jsonify, request
+
 
 class Blockchain(object):
     def __init__(self):
@@ -24,7 +29,7 @@ class Blockchain(object):
         :param transaction:
         :return: True or False
         """
-        if transaction.verify() and Transaction not in self.mempool and utils.str_to_time(transaction.date) >= utils.str_to_time(utils.get_time()) : 
+        if transaction.verify() and transaction not in self.mempool and utils.str_to_time(transaction.date) >= utils.str_to_time(utils.get_time()) : 
             self.mempool.append(transaction)
             return True
         else : 
@@ -127,74 +132,105 @@ class Blockchain(object):
         for b in self.blocks:
             b.log()
 
+# Instantiate our Node
+app = Flask(__name__)
 
-def merge_test():
-    from ecdsa import SigningKey
-    blockchain = Blockchain()
-    sk = SigningKey.generate()
-    for i in range(100):
-        t = Transaction(f"Message {i}")
-        t.sign(sk)
-        blockchain.add_transaction(t)
+# Generate a globally unique address for this node
+node_identifier = str(uuid4()).replace('-', '')
 
-    blockchain2 = Blockchain()
-    sk2 = SigningKey.generate()
-    for i in range(100):
-        t = Transaction(f"Message {i}")
-        t.sign(sk2)
-        blockchain2.add_transaction(t)
-
-    for i in range(3):
-        b = blockchain.new_block()
-        b.mine()
-        blockchain.extend_chain(b)
-
-    for i in range(2):
-        b = blockchain2.new_block()
-        b.mine()
-        blockchain2.extend_chain(b)
-
-    blockchain.merge(blockchain2)
-    blockchain2.merge(blockchain)
-
-    for i in range(2):
-        b = blockchain.new_block()
-        b.mine()
-        blockchain.extend_chain(b)
-
-    for i in range(4):
-        b = blockchain2.new_block()
-        b.mine()
-        blockchain2.extend_chain(b)
-
-    blockchain.merge(blockchain2)
-    blockchain2.merge(blockchain)
-
-    blockchain.log()
+# Instantiate the Blockchain
+blockchain = Blockchain()
 
 
-def simple_test():
-    from ecdsa import SigningKey
-    blockchain = Blockchain()
-    sk = SigningKey.generate()
-    for i in range(100):
-        t = Transaction(f"Message {i}")
-        t.sign(sk)
-        blockchain.add_transaction(t)
+@app.route('/mine', methods=['GET'])
+def mine():
+    # We run the proof of work algorithm to get the next proof...
+    last_block = blockchain.last_block
+    last_proof = last_block['proof']
+    proof = blockchain.proof_of_work(last_proof)
 
-    print(blockchain)
-    for i in range(3):
-        b = blockchain.new_block()
-        b.mine()
-        blockchain.extend_chain(b)
+    # We must receive a reward for finding the proof.
+    # The sender is "0" to signify that this node has mined a new coin.
+    blockchain.new_transaction(
+        sender="0",
+        recipient=node_identifier,
+        amount=1,
+    )
 
-    print(blockchain)
-    print(b.validity())
-    print(len(blockchain))
+    # Forge the new Block by adding it to the chain
+    previous_hash = blockchain.hash(last_block)
+    block = blockchain.new_block(proof, previous_hash)
+
+    response = {
+        'message': "New Block Forged",
+        'index': block['index'],
+        'transactions': block['transactions'],
+        'proof': block['proof'],
+        'previous_hash': block['previous_hash'],
+    }
+    return jsonify(response), 200
+  
+@app.route('/transactions/new', methods=['POST'])
+def new_transaction():
+    values = request.get_json()
+
+    # Check that the required fields are in the POST'ed data
+    required = ['sender', 'recipient', 'amount']
+    if not all(k in values for k in required):
+        return 'Missing values', 400
+
+    # Create a new Transaction
+    index = blockchain.new_transaction(values['sender'], values['recipient'], values['amount'])
+
+    response = {'message': f'Transaction will be added to Block {index}'}
+    return jsonify(response), 201
+
+@app.route('/chain', methods=['GET'])
+def full_chain():
+    response = {
+        'chain': blockchain.chain,
+        'length': len(blockchain.chain),
+    }
+    return jsonify(response), 200
+
+#curl -X POST -H "Content-Type: application/json" -d '{
+# "nodes": ["http://127.0.0.1:5000/"]}' "http://localhost:5000/nodes/register"
+
+@app.route('/nodes/register', methods=['POST'])
+def register_nodes():
+    values = request.get_json()
+
+    nodes = values.get('nodes')
+    if nodes is None:
+        return "Error: Please supply a valid list of nodes", 400
+
+    for node in nodes:
+        blockchain.register_node(node)
+
+    response = {
+        'message': 'New nodes have been added',
+        'total_nodes': list(blockchain.nodes),
+    }
+    return jsonify(response), 201
+
+
+@app.route('/nodes/resolve', methods=['GET'])
+def consensus():
+    replaced = blockchain.resolve_conflicts()
+
+    if replaced:
+        response = {
+            'message': 'Our chain was replaced',
+            'new_chain': blockchain.chain
+        }
+    else:
+        response = {
+            'message': 'Our chain is authoritative',
+            'chain': blockchain.chain
+        }
+
+    return jsonify(response), 200
 
 
 if __name__ == '__main__':
-    print("Blockchain test")
-    simple_test()
-    merge_test()
-
+    app.run(host='0.0.0.0', port=5000, debug=True)

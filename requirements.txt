@@ -1,0 +1,5 @@
+rich
+ecdsa
+cryptography
+Flask
+requests

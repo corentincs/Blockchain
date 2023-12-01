@@ -130,3 +130,9 @@ class Blockchain(object):
 
         for b in self.blocks:
             b.log()
+    def comptage(self) : 
+        """renvoie un dictionaire avec l'enssemble des candidats et leur nombre de voie"""
+        comptage = {}
+        for block in self.blocks : 
+            for transaction in block : 
+                

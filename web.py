@@ -112,14 +112,17 @@ def avancement():
     mempool_data = blockchain.mempool
 
     resultats = [0, 0, 0, 0, 0]
-
+    voix = {'candidat1':0, 'candidat2':0, 'candidat3':0, 'candidat4':0, 'candidat5':0,}
     for block in blockchain.blocks:
 
         for transaction in block.transactions:
-            print(transaction.votes)
+            for i, candidat in enumerate(transaction.votes):
+                voix[candidat] += i
+
+    print(voix)
 
 
-    return render_template('avancement.html', mempool_data=mempool_data, blockchain=blockchain)
+    return render_template('avancement.html', mempool_data=mempool_data, blockchain=blockchain, voix=voix)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

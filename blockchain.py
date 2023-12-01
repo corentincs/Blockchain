@@ -141,11 +141,11 @@ class Blockchain(object):
         try : 
             for i in range(len(self.last_block.transactions[0].votes)) :
                 candidats[self.last_block.transactions[0].votes[i]] = i
-        except : return "aucun vote enregistrer"
+        except : return "aucun vote enregistré"
         #on créé une matrice de préférence entre les candidats qui compile les votes
         comptage = [[0 for i in range(len(candidats))] for i in range(len(candidats))]
         for block in self.blocks : 
-            for transaction in block : 
+            for transaction in block.transactions : 
                 votes = transaction.votes
                 for i in range(len(votes)) : 
                     for j in range(i+1,len(votes)) : 

@@ -1,13 +1,13 @@
 """
-This module define a transaction class. A transaction is a message signed by a private key.
+This module define a transaction class. A transaction is a votes signed by a private key.
 The signature can be verified with the public key.
 
 A transaction is a dictionary with the following keys:
-    - message: the message to sign
+    - votes: the votes to sign
     - date: the date of the transaction
     - author: the hash of the public key
     - vk: the public key
-    - signature: the signature of the message
+    - signature: the signature of the votes
 
 The signature and the public key are binary strings. Both are converted to hexadecimal (base64) string to be
 stored in the transaction.
@@ -30,19 +30,19 @@ class IncompleteTransaction(Exception):
 
 
 class Transaction(object):
-    def __init__(self, message, date=None, signature=None, vk=None, author=None):
+    def __init__(self, votes, date=None, signature=None, vk=None, author=None):
         """
         Initialize a transaction. If date is None, the current time is used.
         Signature and verifying key may be None.
 
         Author is the hash of the verifying key (or None if vk is not specified).
 
-        :param message: str
+        :param votes: str
         :param date: str in format "%Y-%m-%d %H:%M:%S.%f" see (module "utils")
         :param signature: str
         :param vk: str
         """
-        self.message = message
+        self.votes = votes
         if date : 
             self.date = date
         else : 
@@ -62,7 +62,7 @@ class Transaction(object):
     @property
     def data(self):
         d = {
-            "message": self.message,
+            "votes": self.votes,
             "date": self.date,
             "author": self.author,
             "vk": self.vk
@@ -98,7 +98,6 @@ class Transaction(object):
         """
         :return: A string representation of the transaction
         """
-        Transaction.log([self])
         return str(self.data)
 
     def __lt__(self, other):
@@ -134,7 +133,7 @@ class Transaction(object):
         """
         table = Table(title=f"List of transactions")
         table.add_column("Hash", justify="left", style="cyan")
-        table.add_column("Message", justify="left", style="cyan")
+        table.add_column("votes", justify="left", style="cyan")
         table.add_column("Date", justify="left", style="cyan")
         table.add_column("Signature", justify="left", style="cyan")
         table.add_column("Author", justify="left", style="cyan")
@@ -142,7 +141,7 @@ class Transaction(object):
         for t in sorted(transactions):
             table.add_row(
                 None if t.vk is None else t.hash()[:14] + "...",
-                t.message,
+                t.votes,
                 t.date[:-7],
                 None if t.signature is None else t.signature[:7] + "...",
                 None if t.author is None else t.author[:7] + "..."
@@ -161,20 +160,19 @@ def test0():
     t4 = Transaction("Four")
     t3.sign(sk)
     t4.sign(sk)
-    Transaction.log([t1, t2, t3, t4])
 
 
 def test1():
     from ecdsa import SigningKey, NIST384p
     sk = SigningKey.generate(curve=NIST384p)
-    t = Transaction("Message de test")
+    t = Transaction("votes de test")
     print(t)
     t.sign(sk)
     print(t)
     print(t.hash())
     print(t.vk)
     print(t.verify())
-    t.message += "2"
+    t.votes.append("2")
     print(t.verify())
 
 

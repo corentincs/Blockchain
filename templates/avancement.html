@@ -4,15 +4,19 @@
 {% block title %}Avancement{% endblock %}
 
 {% block content %}
-    <h1>Avancement du vote</h1>
+    <a href="/mine">Miner un nouveau bloc</a>
+    <br><br>
+    <h3>Avancement du vote</h3>
     <p>...</p>
     
-    <h1>Mempool</h1>
+    <h3>Mempool</h3>
     <ul>
         {% for transaction in mempool_data %}
-            <li>{{ transaction }}</li>
+        <li>{{ transaction }}</li>
         {% endfor %}
     </ul>
-
+    <br>
+    <h3>Etat de la blockchain</h3>
+    {{ blockchain }}
     
 {% endblock %}

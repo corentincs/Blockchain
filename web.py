@@ -119,10 +119,9 @@ def avancement():
             for i, candidat in enumerate(transaction.votes):
                 voix[candidat] += i
 
-    print(voix)
+    #vainqueur = blockchain.comptage()
 
-
-    return render_template('avancement.html', mempool_data=mempool_data, blockchain=blockchain, voix=voix)
+    return render_template('avancement.html', mempool_data=mempool_data, voix=voix, blockchain=blockchain)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

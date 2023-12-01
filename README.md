@@ -9,7 +9,8 @@ Nous allons donc construire une blockchain où les votes auront le rôle des tra
 Une fois que nous aurons fabriqué cette blockchain, le but est de créer une interface graphique afin que les utilisateurs puissent voter facilement.
 
 ## Implémentation du scrutin de Condorcet
-
+On ajoute la fonction comptage à la classe blockchain qui dans un premier temps cumule l'enssemble des votes pour remplir une matrice correspondant aux préférences deuc à deux. 
+Si aucun vainqueur ne sort de cette première étape nous utilisont la méthode du rangement des paires par ordre décroissant pour en déterminer un. 
 
 ## Création de la blockchain
 

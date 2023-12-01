@@ -80,7 +80,6 @@ class Block(object):
             "previous_hash" : self.previous_hash
         }
 
-        Block.log(self)
         return str(data)
 
     def valid_proof(self, difficulty=config.default_difficulty):
@@ -154,8 +153,6 @@ def test():
     transactions = [Transaction(f"Message {i}") for i in range(10)]
     for t in transactions:
         t.sign(sk)
-
-    Transaction.log(transactions)
 
     blocks = [Block()]
     for i in range(5):

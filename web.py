@@ -18,31 +18,10 @@ blockchain = Blockchain()
 
 @app.route('/mine', methods=['GET'])
 def mine():
-    # We run the proof of work algorithm to get the next proof...
-    last_block = blockchain.last_block
-    last_proof = last_block['proof']
-    proof = blockchain.proof_of_work(last_proof)
+    new_block = blockchain.new_block()
+    blockchain.extend_chain(new_block)
 
-    # We must receive a reward for finding the proof.
-    # The sender is "0" to signify that this node has mined a new coin.
-    blockchain.new_transaction(
-        sender="0",
-        recipient=node_identifier,
-        amount=1,
-    )
-
-    # Forge the new Block by adding it to the chain
-    previous_hash = blockchain.hash(last_block)
-    block = blockchain.new_block(proof, previous_hash)
-
-    response = {
-        'message': "New Block Forged",
-        'index': block['index'],
-        'transactions': block['transactions'],
-        'proof': block['proof'],
-        'previous_hash': block['previous_hash'],
-    }
-    return jsonify(response), 200
+    return redirect('/avancement')
 
 #curl -X POST -H "Content-Type: application/json" -d '{
 # "message": "I put my vote"}' "http://localhost:5000/transactions/new"
@@ -109,14 +88,14 @@ def voter():
 
     if request.method == 'POST':
 
-        message = request.form.get("message")
+        votes = [request.form.get("choix"+str(i)) for i in range(1, 6)]
 
         # Check that the required fields are in the POST'ed data
         #required = ['message']
         #if not all(k in values for k in required):
         #    return 'Missing values', 400
 
-        transaction = Transaction(message=message)
+        transaction = Transaction(votes=votes)
         blockchain.add_transaction(transaction)
 
         # Create a new Transaction
@@ -132,7 +111,18 @@ def voter():
 def avancement():
     mempool_data = blockchain.mempool
 
-    return render_template('avancement.html', mempool_data=mempool_data)
+    resultats = [0, 0, 0, 0, 0]
+    voix = {'candidat1':0, 'candidat2':0, 'candidat3':0, 'candidat4':0, 'candidat5':0,}
+    for block in blockchain.blocks:
+
+        for transaction in block.transactions:
+            for i, candidat in enumerate(transaction.votes):
+                voix[candidat] += i
+
+    print(voix)
+
+
+    return render_template('avancement.html', mempool_data=mempool_data, blockchain=blockchain, voix=voix)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

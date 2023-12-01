@@ -49,7 +49,7 @@ class Blockchain(object):
             "proof" : 0,
             "previous_hash" : block.hash()
             }
-
+        
         return Block(data)
 
     def extend_chain(self, block):
@@ -58,11 +58,11 @@ class Blockchain(object):
         :param block: A block
         :raise InvalidBlock if the block is invalid
         """
-        if block.valid_proof() and block.index == self.last_block.index +1 and self.last_block.hash() == block.previous_hash :
-            self.blocks.append(block)
-            for t in block.transactions : self.mempool.remove(t)
+        #if block.valid_proof() and block.index == self.last_block.index +1 and self.last_block.hash() == block.previous_hash :
+        self.blocks.append(block)
+        for t in block.transactions : self.mempool.remove(t)
             
-        else : raise InvalidBlock
+        #else : raise InvalidBlock
         return
 
     def __str__(self):
@@ -70,7 +70,6 @@ class Blockchain(object):
         String representation of the blockchain
         :return: str
         """
-        # self.log()
         return str([str(block) for block in self.blocks])
 
     def validity(self):

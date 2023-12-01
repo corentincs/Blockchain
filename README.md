@@ -11,10 +11,6 @@ Une fois que nous aurons fabriqué cette blockchain, le but est de créer une in
 ## Implémentation du scrutin de Condorcet
 
 
-## Création du serveur
-
-Pour la création du serveur nous allons nous baser sur le TP "Learn Blockchains by Building One" de HackerNoon. Nous créerons notre serveur avec la bibliothèque *flask*.
-
 ## Création de la blockchain
 
 Pour fabriquer la blockchain, on utilise le système de classe de Python. 
@@ -29,6 +25,14 @@ La blockchain va être un objet ayant pour attribut le mempool (.mempool) et les
 On s'occupe ensuite du mempool : la fonction **add_transaction()** permet de rajouter une transaction au mempool. Une fois qu'il y a un assez grand nombre de transactions dans le mempool, on crée un bloc avec **new_block()**. Enfin on ajoute le bloc à la blockchain avec **extend_chain()**.
 
 ## Interface web
+
+L'interface web se trouve dans le fichier _web.py_.
+On commence par créer une app avec Flask et on créer une unique adresse pour le noeud en question.
+On commence ensuite par un créer un objet blockchain (classe Block vue plus tôt) pour y appliquer plusieurs méthodes.
+Déjà, on peut voter avec le **POST /voter** qui, une fois que l'on a rentré notre choix de candidats, envoie dans le mempool ce choix. Qaund le mempool sera assez rempli (on a fixé la taille des blocs à 3 transactions par bloc) on voudra miner des blocs afin d'étendre la blockchain (on utilise le **GET /mine**). On peut suivre l'avancement de l'élection avec le **GET /avancement** qui nous renvoie le nombre de voix pour chaque candidat.
+Enfin, la méthode **GET /nodes/resolve** assure le consensus de la blockchain.
+
+Le fichier _forms.py_ permet de choisir nos candidats lors du vote.
 
 
 ## Modules nécessaire au fonctionnement

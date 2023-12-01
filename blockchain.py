@@ -138,8 +138,10 @@ class Blockchain(object):
         """renvoie le vainqueur du vote en utiisant la Méthode Condorcet avec rangement des paires par ordre décroissant"""
         #on associe chaque candidat à un indice en utilisant le premier vote du dernier block
         candidats = {}
-        for i in range(len(self.last_block.transactions[0].votes)) :
-            candidats[self.last_block.transactions[0].votes[i]] = i
+        try : 
+            for i in range(len(self.last_block.transactions[0].votes)) :
+                candidats[self.last_block.transactions[0].votes[i]] = i
+        except : return "aucun vote enregistrer"
         #on créé une matrice de préférence entre les candidats qui compile les votes
         comptage = [[0 for i in range(len(candidats))] for i in range(len(candidats))]
         for block in self.blocks : 

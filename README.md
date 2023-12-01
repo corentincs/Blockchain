@@ -20,10 +20,13 @@ Pour la création du serveur nous allons nous baser sur le TP "Learn Blockchains
 Pour fabriquer la blockchain, on utilise le système de classe de Python. 
 
 On crée les blocs dans le fichier _block.py_. 
-Les blocs sont les instances de la class *Block()* ayant pour attributs : l'index du bloc (.index), le timestamp de la création (.timestamp), les transactions contenues dans le bloc (.transactions), la preuve de travail (.proof) ainsi que le hash du précédent bloc (.previous_hash).
-On mine les blocs avec la fonction *mine()* qui nous permet d'avoir une preuve de travail et on hash les blocs avec la fonction *hash()*
-On vérifie ensuite la validité des blocs qui sont construits : si la preuve de travail a été correctement effectuée (*valid_proof*), si les transactions sont bien correctes et si le nombre de transactions contenues dans le bloc ne dépasse pas la taille du bloc.
+Les blocs sont les instances de la class **Block()** ayant pour attributs : l'index du bloc (.index), le timestamp de la création (.timestamp), les transactions contenues dans le bloc (.transactions), la preuve de travail (.proof) ainsi que le hash du précédent bloc (.previous_hash).
+On mine les blocs avec la fonction **mine()** qui nous permet d'avoir une preuve de travail et on hash les blocs avec la fonction **hash()**
+On vérifie ensuite la validité des blocs qui sont construits : si la preuve de travail a été correctement effectuée (**valid_proof()**), si les transactions sont bien correctes et si le nombre de transactions contenues dans le bloc ne dépasse pas la taille du bloc.
 
+On va ensuite lier les blocs entre eux dans le fichier _blockchain.py_.
+La blockchain va être un objet ayant pour attribut le mempool (.mempool) et les blocs formant la blockchain (.blocks).
+On s'occupe ensuite du mempool : la fonction **add_transaction()** permet de rajouter une transaction au mempool. Une fois qu'il y a un assez grand nombre de transactions dans le mempool, on crée un bloc avec **new_block()**. Enfin on ajoute le bloc à la blockchain avec **extend_chain()**.
 
 ## Interface web
 

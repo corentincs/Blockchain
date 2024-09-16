@@ -1,48 +1,30 @@
-# Un système de vote en ligne plus sûr
+## A More Secure Online Voting System
+#Brief Overview
+We are developing a voting system based on blockchain technology. Instead of traditional binary voting, voters will assign a score ranging from 1 (strongly disagree) to 5 (strongly agree) for each proposal.
 
-## Brève description
+In this project, we will construct a blockchain where votes function as transactions. These votes will later be retrieved to determine the election results.
 
-On travaille sur un système de vote se basant sur la blockchain. Le vote ne sera pas binaire mais on attribuera une note entre 1 (peu d'accord) et 5 (très d'accord) à chaque proposition. 
+Once the blockchain is built, our goal is to design a user-friendly graphical interface, allowing users to cast their votes seamlessly.
 
-Nous allons donc construire une blockchain où les votes auront le rôle des transactions. Il faudra ensuite récupérer ces votes pour obtenir le résultat de l'élection. 
+#Implementation of the Condorcet Method
+We will integrate a counting function within the blockchain class that will first aggregate the votes to populate a matrix representing pairwise preferences. If no clear winner emerges from this initial stage, we will use the ranked pairs method to determine the final outcome.
 
-Une fois que nous aurons fabriqué cette blockchain, le but est de créer une interface graphique afin que les utilisateurs puissent voter facilement.
+#Blockchain Creation
+For the blockchain creation, we will use Python’s class system.
 
-## Implémentation du scrutin de Condorcet
-On ajoute la fonction comptage à la classe blockchain qui dans un premier temps cumule l'enssemble des votes pour remplir une matrice correspondant aux préférences deuc à deux. 
-Si aucun vainqueur ne sort de cette première étape nous utilisont la méthode du rangement des paires par ordre décroissant pour en déterminer un. 
+Blocks will be created in the block.py file. Each block will be an instance of the Block() class, with attributes including: the block index (.index), timestamp of creation (.timestamp), the transactions contained within the block (.transactions), proof of work (.proof), and the hash of the previous block (.previous_hash). The blocks will be mined using the mine() function to generate proof of work, and the blocks will be hashed using the hash() function. Once created, the validity of each block is verified—ensuring proof of work is completed correctly (valid_proof()), that the transactions are valid, and that the block does not exceed the transaction limit.
 
-## Création de la blockchain
+Next, the blocks are linked in the blockchain.py file. The blockchain will be an object with attributes for the mempool (.mempool) and the blocks that form the chain (.blocks). The mempool will manage transactions via the add_transaction() function, which adds transactions to the mempool. Once enough transactions are gathered, a new block is created with new_block() and added to the chain using extend_chain().
 
-Pour fabriquer la blockchain, on utilise le système de classe de Python. 
+#Web Interface
+The web interface will be managed in the web.py file. We will start by creating a Flask app and assigning a unique address for each node. Next, we will create a blockchain object (using the previously defined Block class) and apply several methods. Users can vote through the POST /vote endpoint, which submits their candidate choice into the mempool. When the mempool reaches the set size (3 transactions per block), the blocks can be mined via the GET /mine endpoint. Election progress can be tracked using the GET /progress endpoint, which returns the number of votes for each candidate. Finally, the GET /nodes/resolve method ensures blockchain consensus.
 
-On crée les blocs dans le fichier _block.py_. 
-Les blocs sont les instances de la class **Block()** ayant pour attributs : l'index du bloc (.index), le timestamp de la création (.timestamp), les transactions contenues dans le bloc (.transactions), la preuve de travail (.proof) ainsi que le hash du précédent bloc (.previous_hash).
-On mine les blocs avec la fonction **mine()** qui nous permet d'avoir une preuve de travail et on hash les blocs avec la fonction **hash()**
-On vérifie ensuite la validité des blocs qui sont construits : si la preuve de travail a été correctement effectuée (**valid_proof()**), si les transactions sont bien correctes et si le nombre de transactions contenues dans le bloc ne dépasse pas la taille du bloc.
+The forms.py file allows users to select candidates during voting.
 
-On va ensuite lier les blocs entre eux dans le fichier _blockchain.py_.
-La blockchain va être un objet ayant pour attribut le mempool (.mempool) et les blocs formant la blockchain (.blocks).
-On s'occupe ensuite du mempool : la fonction **add_transaction()** permet de rajouter une transaction au mempool. Une fois qu'il y a un assez grand nombre de transactions dans le mempool, on crée un bloc avec **new_block()**. Enfin on ajoute le bloc à la blockchain avec **extend_chain()**.
+#Required Modules
+The following Python libraries are required for the program to run properly: rich, ecdsa, cryptography, Flask, and requests. The rich library is used for display formatting, ecdsa handles key creation, cryptography manages encryption, and Flask and requests allow server creation and interaction.
 
-## Interface web
+#Authors and Acknowledgements
+Special thanks to Marc-Antoine Weisser for his guidance and support.
 
-L'interface web se trouve dans le fichier _web.py_.
-On commence par créer une app avec Flask et on créer une unique adresse pour le noeud en question.
-On commence ensuite par un créer un objet blockchain (classe Block vue plus tôt) pour y appliquer plusieurs méthodes.
-Déjà, on peut voter avec le **POST /voter** qui, une fois que l'on a rentré notre choix de candidats, envoie dans le mempool ce choix. Qaund le mempool sera assez rempli (on a fixé la taille des blocs à 3 transactions par bloc) on voudra miner des blocs afin d'étendre la blockchain (on utilise le **GET /mine**). On peut suivre l'avancement de l'élection avec le **GET /avancement** qui nous renvoie le nombre de voix pour chaque candidat.
-Enfin, la méthode **GET /nodes/resolve** assure le consensus de la blockchain.
-
-Le fichier _forms.py_ permet de choisir nos candidats lors du vote.
-
-
-## Modules nécessaire au fonctionnement
-
-Pour faire tourner correctement notre programme, nous aurons besoins des bibliothèques suivantes : rich, ecdsa, cryptography, Flask, requests. 
-La bibliothèque *rich* sera utilisé pour l'affichage, *ecdsa* permet de créer des clés, *cryptography* sera utilisé pour tous les encryptages, *Flask* et *requests* permettront de créer le serveur et d'interagir avec lui.
-
-## Auteurs et remerciements
-Merci à Marc-Antoine Weisser pour ses explications et son aide.
-
-GARREAU Corentin, MACHABERT Guillaume, REMOUÉ Arthur.
-
+GARREAU Corentin
